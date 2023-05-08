@@ -3,7 +3,7 @@ Simple Spotify Library for Python
 
 
 ## Installation
-For now, there is not way to install, please just drag/drop the folder until the project is in a more complete state, and is pip-installable 
+For now, there is not a way to install, please just drag/drop the folder until the project is in a more complete state, and is pip-installable 
 
 
 ## Usage 
