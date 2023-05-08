@@ -27,9 +27,9 @@ print(f"{track.name} By {track.artist} ({track.album})")
 - [x] Track searching
 - [x] Album searching
 - [x] No-Credential (ID only) authentication
-- [] Multiple track searching
-- [] Returning full data with Track/Album objects
+- [ ] Multiple track searching
+- [ ] Returning full data with Track/Album objects
 
 ## Not planned (PR only)
-- [] Interacting with spotify (liking/saving/etc)
-- [] Authenticating by password/oauth/etc (non-user ID only authentication)
+- [ ] Interacting with spotify (liking/saving/etc)
+- [ ] Authenticating by password/oauth/etc (non-user ID only authentication)
