@@ -34,3 +34,16 @@ print(f"{track.name} By {track.artist} ({track.album})")
 ## Not planned (PR only)
 - [ ] Interacting with spotify (liking/saving/etc)
 - [ ] Authenticating by password/oauth/etc (non-user ID only authentication)
+
+
+
+
+
+
+
+# Notes
+- I do not plan on covering the FULL spotify API myself, if you wish for something to be added thats not in the Planned section of the roadmap, please add a PR with the change.
+
+- This library at its core is about getting data from spotify, not changing it, that would require code and developer input which defeats the point of this project, which is being simple as possible and requiring as little as possible on the developers end.
+
+- This library does not support any way of authenticating other than client id/secret.
