@@ -7,7 +7,7 @@ For now, there is not way to install, please just drag/drop the folder until the
 
 
 ## Usage 
-Getting a tracks data:
+Getting a track’s data:
 ```py
 from spotify.spotify import SpotifyInterface
 
