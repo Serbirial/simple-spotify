@@ -26,8 +26,9 @@ print(f"{track.name} By {track.artist} ({track.album})")
 ## Planned
 - [x] Track searching
 - [x] Album searching
+- [x] Playlist searching
+- [x] Multiple track searching
 - [x] No-Credential (ID only) authentication
-- [ ] Multiple track searching
 - [ ] Returning full data with Track/Album objects
 
 ## Not planned (PR only)

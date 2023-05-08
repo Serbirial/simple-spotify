@@ -53,23 +53,24 @@ class SpotifyHandler:
 
     # Internal
 
-    def build_many_tracks_req_data(self, track_ids: list):
+
+    # Interfacing with spotify #
+
+    def search_many_tracks(self, track_ids: list):
         """ Why individually send a request for every track to get info, when you can get everything all in one? """
-        req_data   = build_album_track_req_data(album_id, self.access_token)
+        req_data   = build_many_tracks_req_data(track_ids, self.access_token)
         r = requests.get(req_data[0], headers=req_data[1])
         data = r.json()
         if r.status_code == 200:
             tracks = []
-            for x in data["items"]:
-                album_obj.tracks.append(SpotifyTrack(
+            for x in data["tracks"]:
+                tracks.append(SpotifyTrack(
                     x["name"],
-                    data["items"][0]["artists"][0]["name"],
-                    album,
-                    None if len(data["items"][0]["artists"]) <= 1 else [y["name"] for y in data["items"][0]["artists"] if y["name"] != data["items"][0]["artists"][0]["name"]]
+                    data["tracks"][0]["artists"][0]["name"],
+                    x["album"]["name"],
+                    None if len(data["tracks"][0]["artists"]) <= 1 else [y["name"] for y in data["tracks"][0]["artists"] if y["name"] != data["tracks"][0]["artists"][0]["name"]]
                     ))
-        return album_obj
-
-    # Interfacing with spotify #
+        return tracks
 
     def search_id(self, track_id: str):
         """ Searches spotify, looking for a track with `track_id `"""
@@ -103,3 +104,20 @@ class SpotifyHandler:
                     None if len(data["items"][0]["artists"]) <= 1 else [y["name"] for y in data["items"][0]["artists"] if y["name"] != data["items"][0]["artists"][0]["name"]]
                     ))
         return album_obj
+
+    def search_playlist_tracks(self, playlist_id: list):
+        """ Get all tracks off a playlist, searches for playlist by `playlist_id` """
+        req_data   = build_playlist_tracks_req_data(playlist_id, self.access_token)
+        r = requests.get(req_data[0], headers=req_data[1])
+        data = r.json()
+        if r.status_code == 200:
+            tracks = []
+            for x in data["items"]:
+                if x["track"]["type"] == "track":
+                    tracks.append(SpotifyTrack(
+                        x["track"]["name"],
+                        x["track"]["artists"][0]["name"],
+                        x["track"]["album"]["name"],
+                        None if len(x["track"]["artists"]) <= 1 else [artist["name"] for artist in x["track"]["artists"] if artist["name"] != x["track"]["artists"][0]["name"]]
+                        ))
+        return tracks

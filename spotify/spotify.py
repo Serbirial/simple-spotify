@@ -10,3 +10,9 @@ class SpotifyInterface:
 
     def search_album_tracks(self, album_id: str):
         return self.spotify_handler.search_album_tracks(album_id)
+
+    def search_many_tracks(self, album_id: str):
+        return self.spotify_handler.search_many_tracks(album_id)
+
+    def search_playlist_tracks(self, album_id: str):
+        return self.spotify_handler.search_playlist_tracks(album_id)

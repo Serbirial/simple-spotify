@@ -26,6 +26,9 @@ def build_album_req_data(album_id: str, session_key):
     return _build_req_data(f'albums/{album_id}', session_key)
 
 def build_many_tracks_req_data(track_ids: list, session_key):
-    processed_ids = [f'{x}%2' for x in track_ids]
-    return _build_req_data(f'tracks?ids={processed_ids}', session_key)
+    return _build_req_data(f'tracks?ids={"%2c".join(track_ids)}', session_key)
+
+
+def build_playlist_tracks_req_data(playlist_id: str, session_key):
+    return _build_req_data(f'playlists/{playlist_id}/tracks', session_key)
 

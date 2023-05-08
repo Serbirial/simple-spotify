@@ -1,9 +1,9 @@
-EMPTY_LIST = []
+
 
 class SpotifyAlbum(object):
-    def __init__(self, name, tracks: list = EMPTY_LIST, total: int = None):
+    def __init__(self, name, tracks: list = None, total: int = None):
         self.name          = name
-        self.tracks        = tracks
+        self.tracks        = tracks if tracks else []
         self.total         = total
 
 class SpotifyTrack(object):
