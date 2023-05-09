@@ -15,8 +15,8 @@ class SpotifyInterface:
 
     def search_many_tracks(self, tracks_ids: list):
         """ Search for multiple tracks at once. `track_ids` is a list full of spotify track IDs, returns a list of SpotifyTrack objects """
-        return self.spotify_handler.search_many_tracks(album_id)
+        return self.spotify_handler.search_many_tracks(tracks_ids)
 
     def search_playlist_tracks(self, playlist_id: str):
         """ Search a playlists tracks on spotify. `playlist_id` is a spotify playlist ID, returns a list of SpotifyTrack objects"""
-        return self.spotify_handler.search_playlist_tracks(album_id)
+        return self.spotify_handler.search_playlist_tracks(playlist_id)
