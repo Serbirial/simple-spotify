@@ -1,8 +1,10 @@
 import time
+import re
 import requests
 
 from .request_data import build_headers, route, _build_token_req_data
-from .objects import SpotifyAlbum, SpotifyTrack
+from .objects import SpotifyAlbum, SpotifyTrack, SpotifyIDRegex
+from .cache import Cache
 
 from threading import Thread
 
@@ -18,6 +20,7 @@ class SpotifyHandler:
         self.token_request_data  = _build_token_req_data(client_id, client_secret)
         self.client_id           = client_id
         self.client_secret       = client_secret
+        self.cache = Cache()
         self.create_access_token()
 
     # Authentication #
@@ -54,40 +57,62 @@ class SpotifyHandler:
 
     # Internal
 
+    def _put_object_in_cache(self, spotify_id: str, _object):
+        """ Using this WILL cause the library to break. """
+        self.cache.put(spotify_id, _object)
 
     # Interfacing with spotify #
 
     def search_many_tracks(self, track_ids: list) -> list:
         """ Why individually send a request for every track to get info, when you can get everything all in one? `track_ids` is a list of track IDs to search"""
+        tracks = []
+        # Check if ID is already in cache
+        for _id in track_ids:
+            if self.cache.get(_id):
+                tracks.append(self.cache.get(_id))
+        # All the tracks have been found in the cache
+        if len(track_ids)==len(tracks):
+            return tracks
         # Get tracks data
         r = requests.get(route(f"tracks?ids={'%2c'.join(track_ids)}"), headers=build_headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
-            tracks = []
             for x in data["tracks"]:
-                tracks.append(SpotifyTrack(
+                track = SpotifyTrack(
                     x["name"],
                     x["artists"][0]["name"],
                     x["album"]["name"],
                     None if len(x["artists"]) <= 1 else [y["name"] for y in x["artists"] if y["name"] != x["artists"][0]["name"]]
-                    ))
-        return tracks
+                    )
+                # Put track in cache
+                self._put_object_in_cache(x["id"], track)
+                tracks.append(track)
+            return tracks
 
     def search_id(self, track_id: str) -> SpotifyTrack:
         """ Searches spotify, looking for a track with `track_id `"""
+        check = self.cache.get(track_id)
+        if check:
+            return check
         # Get track data
         r = requests.get(route(f'tracks/{track_id}'), headers=build_headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
-            return SpotifyTrack(
+            track = SpotifyTrack(
                 data["name"],
                 data["artists"][0]["name"],
                 data["album"]["name"],
                 None if len(data["artists"]) <= 1 else [x["name"] for x in data["artists"] if x["name"] != data["artists"][0]["name"]]
                 )
+            # Put track in cache
+            self._put_object_in_cache(track_id, track)
+            return track
 
     def search_album_tracks(self, album_id: str) -> SpotifyAlbum:
         """ Gets all tracks off an album, searches for album by `album_id` """
+        check = self.cache.get(album_id)
+        if check:
+            return check
         # Get album tracks data
         r = requests.get(route(f'albums/{album_id}/tracks'), headers=build_headers(self.access_token))
         # Get album data
@@ -104,21 +129,30 @@ class SpotifyHandler:
                     album,
                     None if len(x["artists"]) <= 1 else [y["name"] for y in x["artists"] if y["name"] != x["artists"][0]["name"]]
                     ))
-        return album_obj
+            # Put album in cache
+            self._put_object_in_cache(album_id, album_obj)
+            return album_obj
 
     def search_playlist_tracks(self, playlist_id: list) -> list:
-        """ Get all tracks off a playlist, searches for playlist by `playlist_id` """
+        """ Get all tracks off a playlist, searches for playlist by `playlist_id`"""
+        check = self.cache.get(playlist_id)
+        if check:
+            return check
         # Get playlist tracks data
-        r = requests.get(route(f"playlists/{playlist_id}/tracks"), headers=headers(self.access_token))
+        r = requests.get(route(f"playlists/{playlist_id}/tracks"), headers=build_headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
-            tracks = []
+            playlist_obj = SpotifyAlbum(name="User Playlist [PLAYLIST NAMES NOT SUPPORTED YET]")
             for x in data["items"]:
                 if x["track"]["type"] == "track":
-                    tracks.append(SpotifyTrack(
+                    playlist_obj.tracks.append(SpotifyTrack(
                         x["track"]["name"],
                         x["track"]["artists"][0]["name"],
                         x["track"]["album"]["name"],
                         None if len(x["track"]["artists"]) <= 1 else [artist["name"] for artist in x["track"]["artists"] if artist["name"] != x["track"]["artists"][0]["name"]]
                         ))
-        return tracks
+
+                    playlist_obj.total += 1
+            # Put playlist in cache
+            self._put_object_in_cache(playlist_id, playlist_obj)
+            return playlist_obj

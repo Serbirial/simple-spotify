@@ -1,11 +1,11 @@
 
+SpotifyIDRegex = r"[0-9][0-9A-Za-z]+[0-9a-z]+"
+
 
 class SpotifyAlbum(object): 
-    """ Spotify Album Object
-
-    this can be re-used to trick things into thinking a playlist is an album as you will only get returned a list of tracks when getting playlists
-    letting you use the same logic in your project as you would for albums """
-    def __init__(self, name, tracks: list = None, total: int = None):
+    """ Spotify Album Object 
+        This is sometimes re-used for other things, like playlists. """
+    def __init__(self, name, tracks: list = None, total: int = 0):
         self.name          = name
         self.tracks        = tracks if tracks else []
         self.total         = total
