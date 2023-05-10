@@ -67,9 +67,9 @@ class SpotifyHandler:
             for x in data["tracks"]:
                 tracks.append(SpotifyTrack(
                     x["name"],
-                    data["tracks"][0]["artists"][0]["name"],
+                    x["artists"][0]["name"],
                     x["album"]["name"],
-                    None if len(data["tracks"][0]["artists"]) <= 1 else [y["name"] for y in data["tracks"][0]["artists"] if y["name"] != data["tracks"][0]["artists"][0]["name"]]
+                    None if len(x["artists"]) <= 1 else [y["name"] for y in x["artists"] if y["name"] != x["artists"][0]["name"]]
                     ))
         return tracks
 
@@ -100,9 +100,9 @@ class SpotifyHandler:
             for x in data["items"]:
                 album_obj.tracks.append(SpotifyTrack(
                     x["name"],
-                    data["items"][0]["artists"][0]["name"],
+                    x["artists"][0]["name"],
                     album,
-                    None if len(data["items"][0]["artists"]) <= 1 else [y["name"] for y in data["items"][0]["artists"] if y["name"] != data["items"][0]["artists"][0]["name"]]
+                    None if len(x["artists"]) <= 1 else [y["name"] for y in x["artists"] if y["name"] != x["artists"][0]["name"]]
                     ))
         return album_obj
 
