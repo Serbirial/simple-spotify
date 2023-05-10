@@ -1,6 +1,10 @@
 from .spotify_logic import SpotifyHandler
 
 class SpotifyInterface:
+    """ 
+    This is what you use to interact with spotify.
+        client_id:     Spotify application ID
+        client_secret: Spotify application ID """
     def __init__(self, client_id: str, client_secret: str):
         self.spotify_handler = SpotifyHandler(client_id, client_secret)
 

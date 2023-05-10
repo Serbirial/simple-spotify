@@ -1,8 +1,8 @@
 import time
 import requests
 
-from .request_data import *
-from .objects import *
+from .request_data import build_headers, route, _build_token_req_data
+from .objects import SpotifyAlbum, SpotifyTrack
 
 from threading import Thread
 
@@ -13,8 +13,9 @@ def thread_object(loop_def):
     return expiration_loop
 
 class SpotifyHandler:
+    """ Do not use this unless you have looked through the source-code, this is for internal use. """
     def __init__(self, client_id: str, client_secret: str):
-        self.token_request_data  = build_token_req_data(client_id, client_secret)
+        self.token_request_data  = _build_token_req_data(client_id, client_secret)
         self.client_id           = client_id
         self.client_secret       = client_secret
         self.create_access_token()
@@ -56,10 +57,10 @@ class SpotifyHandler:
 
     # Interfacing with spotify #
 
-    def search_many_tracks(self, track_ids: list):
-        """ Why individually send a request for every track to get info, when you can get everything all in one? """
-        req_data   = build_many_tracks_req_data(track_ids, self.access_token)
-        r = requests.get(req_data[0], headers=req_data[1])
+    def search_many_tracks(self, track_ids: list) -> list:
+        """ Why individually send a request for every track to get info, when you can get everything all in one? `track_ids` is a list of track IDs to search"""
+        # Get tracks data
+        r = requests.get(route(f"tracks?ids={'%2c'.join(track_ids)}"), headers=build_headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
             tracks = []
@@ -72,10 +73,10 @@ class SpotifyHandler:
                     ))
         return tracks
 
-    def search_id(self, track_id: str):
+    def search_id(self, track_id: str) -> SpotifyTrack:
         """ Searches spotify, looking for a track with `track_id `"""
-        req_data = build_track_search_req_data(track_id, self.access_token)
-        r = requests.get(req_data[0], headers=req_data[1])
+        # Get track data
+        r = requests.get(route(f'tracks/{track_id}'), headers=build_headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
             return SpotifyTrack(
@@ -87,10 +88,10 @@ class SpotifyHandler:
 
     def search_album_tracks(self, album_id: str):
         """ Gets all tracks off an album, searches for album by `album_id` """
-        req_data   = build_album_track_req_data(album_id, self.access_token)
-        album_req = build_album_req_data(album_id, self.access_token)
-        r = requests.get(req_data[0], headers=req_data[1])
-        r2 = requests.get(album_req[0], headers=album_req[1])
+        # Get album tracks data
+        r = requests.get(route(f'albums/{album_id}/tracks'), headers=build_headers(self.access_token))
+        # Get album data
+        r2 = requests.get(route(f'albums/{album_id}'), headers=build_headers(self.access_token))
         data = r.json()
         album = None
         if r2.status_code == 200: album = r2.json()["name"]
@@ -107,8 +108,8 @@ class SpotifyHandler:
 
     def search_playlist_tracks(self, playlist_id: list):
         """ Get all tracks off a playlist, searches for playlist by `playlist_id` """
-        req_data   = build_playlist_tracks_req_data(playlist_id, self.access_token)
-        r = requests.get(req_data[0], headers=req_data[1])
+        # Get playlist tracks data
+        r = requests.get(route(f"playlists/{playlist_id}/tracks"), headers=headers(self.access_token))
         data = r.json()
         if r.status_code == 200:
             tracks = []
