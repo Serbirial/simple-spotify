@@ -86,7 +86,7 @@ class SpotifyHandler:
                 None if len(data["artists"]) <= 1 else [x["name"] for x in data["artists"] if x["name"] != data["artists"][0]["name"]]
                 )
 
-    def search_album_tracks(self, album_id: str):
+    def search_album_tracks(self, album_id: str) -> SpotifyAlbum:
         """ Gets all tracks off an album, searches for album by `album_id` """
         # Get album tracks data
         r = requests.get(route(f'albums/{album_id}/tracks'), headers=build_headers(self.access_token))
@@ -106,7 +106,7 @@ class SpotifyHandler:
                     ))
         return album_obj
 
-    def search_playlist_tracks(self, playlist_id: list):
+    def search_playlist_tracks(self, playlist_id: list) -> list:
         """ Get all tracks off a playlist, searches for playlist by `playlist_id` """
         # Get playlist tracks data
         r = requests.get(route(f"playlists/{playlist_id}/tracks"), headers=headers(self.access_token))
